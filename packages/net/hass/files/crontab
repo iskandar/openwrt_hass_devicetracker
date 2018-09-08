@@ -1,0 +1,1 @@
+0 * * * * /usr/lib/hass/sync_state.sh

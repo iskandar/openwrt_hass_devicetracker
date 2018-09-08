@@ -2,6 +2,19 @@
 
 Package for a completely event-driven device/user presence tracker for [Home Assistant](https://github.com/home-assistant/home-assistant/) on an OpenWRT/LEDE access point. 
 
+## Iskandar's Modifications
+
+I wanted to use this in a mixed device tracker environment in a fashion that treats the devices detected by this script separately from other devices. In order to do this, these scripts now can use 'device mode', which maps a MAC address to a device name in the `devices` file.
+
+To enable this mode:
+
+* Edit your `/usr/lib/hass/devices` file
+* Set the config setting `use_device_id` to `1`
+* Reload the daemon: `/etc/init.d/hass reload`
+
+I tested with this specific OpenWRT version: 
+
+* `OpenWrt 18.06.1 r7258-5eb055306f / LuCI openwrt-18.06 branch (git-18.228.31946-f64b152)`
 
 ## Description
 

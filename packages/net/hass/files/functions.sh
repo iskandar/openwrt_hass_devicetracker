@@ -24,7 +24,6 @@ function post {
     
     config_get hass_host global host
     config_get hass_pw global pw
-    
     resp=$(curl "$hass_host/api/services/device_tracker/see" -sfSX POST \
         -H 'Content-Type: application/json' \
         -H "X-HA-Access: $hass_pw" \
@@ -39,8 +38,8 @@ function post {
     logger -t $0 -p $level "post response $resp"
 }
 
-function build_payload {
-    logger -t $0 -p debug "build_payload $@"
+function build_mac_payload {
+    logger -t $0 -p debug "build_mac_payload $@"
     if [ "$#" -ne 3 ]; then
         err_msg "Invalid payload parameters"
         logger -t $0 -p warning "push_event not handled"
@@ -49,8 +48,21 @@ function build_payload {
     mac=$1
     host=$2
     consider_home=$3
-    
+
     echo "{\"mac\":\"$mac\",\"host_name\":\"$host\",\"consider_home\":\"$consider_home\",\"source_type\":\"router\"}"
+}
+
+function build_device_payload {
+    logger -t $0 -p debug "build_device_payload $@"
+    if [ "$#" -ne 2 ]; then
+        err_msg "Invalid payload parameters"
+        logger -t $0 -p warning "push_event not handled"
+        exit 1
+    fi
+    device_id=$1
+    consider_home=$2
+
+    echo "{\"dev_id\":\"$device_id\",\"consider_home\":\"$consider_home\",\"source_type\":\"router\"}"
 }
 
 function get_ip {
@@ -61,6 +73,11 @@ function get_ip {
 function get_host_name {
     # get hostname for mac
     nslookup "$(get_ip $1)" | grep -oP "(?<=name = ).*$"
+}
+
+function get_device_id {
+    # get device for mac 
+    grep "$1" /usr/lib/hass/devices | awk '{print $2}'    
 }
 
 function push_event {
@@ -75,6 +92,7 @@ function push_event {
     
     config_get hass_timeout_conn global timeout_conn
     config_get hass_timeout_disc global timeout_disc
+    config_get hass_use_device_id global use_device_id
     
     case $msg in 
         "AP-STA-CONNECTED")
@@ -92,18 +110,29 @@ function push_event {
             ;;
     esac
 
-    post $(build_payload "$mac" "$(get_host_name $mac)" "$timeout")
+    logger -t $0 -p debug "hass_use_device_id: $hass_use_device_id"
+    if [ "$hass_use_device_id" = "1" ]; then
+        post $(build_device_payload "$(get_device_id $mac)" "$timeout")
+    else
+        post $(build_mac_payload "$mac" "$(get_host_name $mac)" "$timeout")
+    fi
 }
 
 function sync_state {
     logger -t $0 -p debug "sync_state $@"
 
     config_get hass_timeout_conn global timeout_conn
+    config_get hass_use_device_id global use_device_id
 
+    timeout=$hass_timeout_conn
     for interface in `iw dev | grep Interface | cut -f 2 -s -d" "`; do
         maclist=`iw dev $interface station dump | grep Station | cut -f 2 -s -d" "`
-        for mac in $maclist; do
-            post $(build_payload "$mac" "$(get_host_name $mac)" "$hass_timeout_conn") &
+        for mac in $maclist; do                
+            if [ "$hass_use_device_id" = "1" ]; then
+                post $(build_device_payload "$(get_device_id $mac)" "$timeout") &
+            else
+                post $(build_mac_payload "$mac" "$(get_host_name $mac)" "$timeout") &
+            fi
         done
     done
 }

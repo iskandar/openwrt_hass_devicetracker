@@ -29,6 +29,11 @@ stop_service() {
 
 reload_service()
 {
+<<<<<<< HEAD
+    stop
+    start
+=======
         stop
         start
+>>>>>>> 1ef25c7b90484ecbfeed4e3d79cd1ba7352f3a3a
 }
