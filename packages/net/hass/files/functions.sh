@@ -15,12 +15,20 @@ function register_hook {
 }
 
 function post {
-    logger -t $0 -p debug "post $@"
+    if [ -z $@ ]; then
+        # logger -t $0 -p warning "No payload found"
+        exit 1
+    fi
     if [ "$#" -ne 1 ]; then
-        err_msg "POST missing payload"
+        # err_msg "POST missing payload"
         exit 1
     fi
     payload=$1
+    if [ -z $payload ]; then
+        # logger -t $0 -p warning "No payload found"
+        exit 1
+    fi
+    logger -t $0 -p debug "post $@"
     
     config_get hass_host global host
     config_get hass_pw global pw
@@ -39,7 +47,7 @@ function post {
 }
 
 function build_mac_payload {
-    logger -t $0 -p debug "build_mac_payload $@"
+    # logger -t $0 -p debug "build_mac_payload $@"
     if [ "$#" -ne 3 ]; then
         err_msg "Invalid payload parameters"
         logger -t $0 -p warning "push_event not handled"
@@ -53,7 +61,7 @@ function build_mac_payload {
 }
 
 function build_device_payload {
-    logger -t $0 -p debug "build_device_payload $@"
+    # logger -t $0 -p debug "build_device_payload $@"
     if [ "$#" -ne 2 ]; then
         err_msg "Invalid payload parameters"
         logger -t $0 -p warning "push_event not handled"
@@ -61,7 +69,10 @@ function build_device_payload {
     fi
     device_id=$1
     consider_home=$2
-
+    if [ -z $device_id ]; then
+        #logger -t $0 -p warning "No device id found"
+        exit 1
+    fi
     echo "{\"dev_id\":\"$device_id\",\"consider_home\":\"$consider_home\",\"source_type\":\"router\"}"
 }
 
@@ -77,7 +88,7 @@ function get_host_name {
 
 function get_device_id {
     # get device for mac 
-    grep "$1" /usr/lib/hass/devices | awk '{print $2}'    
+    grep -i "$1" /usr/lib/hass/devices | awk '{print $2}'
 }
 
 function push_event {
@@ -110,7 +121,6 @@ function push_event {
             ;;
     esac
 
-    logger -t $0 -p debug "hass_use_device_id: $hass_use_device_id"
     if [ "$hass_use_device_id" = "1" ]; then
         post $(build_device_payload "$(get_device_id $mac)" "$timeout")
     else

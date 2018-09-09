@@ -8,9 +8,11 @@ logger -t $0 -p info "Starting up"
 
 source /usr/lib/hass/functions.sh
 
-logger -t $0 -p info "Hooking onto existing interfaces"
-for interface in `iw dev | grep Interface | cut -f 2 -s -d" "`
+interfaces=`iw dev | grep Interface | cut -f 2 -s -d" "`
+logger -t $0 -p info "Hooking onto existing interfaces: $interfaces"
+for interface in $interfaces
 do
+    logger -t $0 -p info "-- $interface"
     register_hook $interface
 done
 

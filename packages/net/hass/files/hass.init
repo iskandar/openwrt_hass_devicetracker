@@ -1,6 +1,6 @@
 #!/bin/sh /etc/rc.common
 
-START=50
+START=99
 USE_PROCD=1
 PROG=/usr/bin/hassd.sh
 PIDFILE=/var/run/hass.pid
@@ -29,11 +29,6 @@ stop_service() {
 
 reload_service()
 {
-<<<<<<< HEAD
     stop
     start
-=======
-        stop
-        start
->>>>>>> 1ef25c7b90484ecbfeed4e3d79cd1ba7352f3a3a
 }
