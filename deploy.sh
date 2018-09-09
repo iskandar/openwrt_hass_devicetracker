@@ -6,7 +6,7 @@
 
 set -x
 
-TARGET=${1:root@router}
+TARGET=${1:-root@router}
 BASE=./packages/net/hass/files
 
 scp $BASE/hassd.sh $TARGET:/usr/bin/
