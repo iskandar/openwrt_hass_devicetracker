@@ -1,6 +1,8 @@
 config hass 'global'
         option host 'http://your-hass:8123'
+        # Remove these items if you are using Trusted Network auth
         option token 'your-long-lived-token'
+        option pw 'legacy-password'
         option timeout_conn '02:00:00'
         option timeout_disc '00:00:05'
         option use_device_id '1'

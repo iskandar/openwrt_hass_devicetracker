@@ -1,3 +1,5 @@
+set -x
+
 function err_msg {
     logger -t $0 -p error $@
     echo $1 1>&2
@@ -32,11 +34,13 @@ function post {
     
     config_get hass_host global host
     config_get hass_token global token "0"
-    config_get hass_pw global pw
+    config_get hass_pw global pw "0"
     
+    auth_head="X-No-Auth-Needed: true"
     if [ "$hass_token" != "0" ]; then
         auth_head="Authorization: Bearer $hass_token"
-    else
+    fi
+    if [ "$hass_pw" != "0" ]; then
         auth_head="X-HA-Access: $hass_pw"
     fi
     
