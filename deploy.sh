@@ -12,7 +12,7 @@ BASE=./packages/net/hass/files
 scp $BASE/hassd.sh $TARGET:/usr/bin/
 
 ssh $TARGET mkdir -p /usr/lib/hass
-scp $BASE/{functions.sh,push_event.sh,sync_state.sh,devices} $TARGET:/usr/lib/hass/
+scp $BASE/{functions.sh,push_event.sh,sync_state.sh,write_state.sh,devices} $TARGET:/usr/lib/hass/
 
 ssh $TARGET "cat > /etc/config/hass"   < $BASE/hass.conf
 ssh $TARGET "cat > /etc/init.d/hass"   < $BASE/hass.init
@@ -22,6 +22,8 @@ ssh $TARGET /bin/sh << EOF
 chmod +x /usr/bin/hassd.sh
 chmod +x /usr/lib/hass/*.sh
 chmod +x /etc/init.d/hass
+/etc/init.d/hass enable
 /etc/init.d/hass reload
+/etc/init.d/cron enable
 /etc/init.d/cron reload
 EOF

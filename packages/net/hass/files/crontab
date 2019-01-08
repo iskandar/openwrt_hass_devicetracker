@@ -1,1 +1,3 @@
-0 * * * * /usr/lib/hass/sync_state.sh
+*/30 * * * * /usr/lib/hass/sync_state.sh
+*/5  * * * * /usr/lib/hass/write_state.sh
+

@@ -6,7 +6,7 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=hass
-PKG_VERSION:=0.1
+PKG_VERSION:=0.1.1
 PKG_RELEASE:=1
 PKG_LICENSE:=GPL-3.0+
 PKG_MAINTAINER:=Johannes Falke <johannesfalke@gmail.com>
@@ -45,14 +45,21 @@ define Package/hass/install
 
 	$(INSTALL_DIR) $(1)/usr/lib
 	$(INSTALL_DIR) $(1)/usr/lib/hass
+	$(INSTALL_BIN) ./files/devices $(1)/usr/lib/hass/
 	$(INSTALL_BIN) ./files/functions.sh $(1)/usr/lib/hass/
 	$(INSTALL_BIN) ./files/push_event.sh $(1)/usr/lib/hass/
+	$(INSTALL_BIN) ./files/sync_state.sh $(1)/usr/lib/hass/
+	$(INSTALL_BIN) ./files/write_event.sh $(1)/usr/lib/hass/
 
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/hass.init $(1)/etc/init.d/hass
 
 	$(INSTALL_DIR) $(1)/etc/config
 	$(INSTALL_CONF) ./files/hass.conf $(1)/etc/config/hass
+
+	# Warning: this may overwrite your existing crontab!
+	$(INSTALL_DIR) $(1)/etc/crontabs
+	$(INSTALL_BIN) ./files/crontab $(1)/etc/crontabs/root
 
 endef
 

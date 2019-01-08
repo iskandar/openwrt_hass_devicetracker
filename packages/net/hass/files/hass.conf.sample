@@ -1,6 +1,14 @@
 config hass 'global'
         option host 'http://your-hass:8123'
-        option pw 'you-api-key'
+        option token 'your-long-lived-token'
         option timeout_conn '02:00:00'
         option timeout_disc '00:00:05'
         option use_device_id '1'
+        option dns_server '192.168.1.1'
+        option use_device_id '1'
+        option use_mqtt '1'
+
+config hass 'mqtt'
+        option url 'mqtt://user:pass@mqtt.lan:1883/' # You'll need a trailing slash here
+        option client_id_base 'router_'
+        option topic_base 'router/devices'
